@@ -44,7 +44,7 @@ class TicTacToe(Game):
                 cell = self.state[x][y]
                 if cell != self.symbols[None]:
                     continue
-                actions.add((self.playing_player, (x, y)))
+                actions.add((x, y))
         return frozenset(actions)
 
     def get_result_for(self, player) -> Game.Result:

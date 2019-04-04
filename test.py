@@ -53,7 +53,7 @@ game.play((2, 0))
 game.play((2, 1))
 
 actions = game.get_possible_actions()
-assert set(actions) == frozenset({(0, (2, 2)), (0, (0, 1)), (0, (1, 1))}), actions
+assert set(actions) == frozenset({(2, 2), (0, 1), (1, 1)}), actions
 
 
 game = TicTacToe()
@@ -65,7 +65,7 @@ game.play((2, 1))
 game.play((2, 0))
 
 actions = game.get_possible_actions()
-assert set(actions) == frozenset({(0, (2, 2)), (0, (0, 1)), (0, (1, 1))}), actions
+assert set(actions) == frozenset({(2, 2), (0, 1), (1, 1)}), actions
 
 
 game = TicTacToe()
