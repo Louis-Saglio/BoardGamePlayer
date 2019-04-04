@@ -81,3 +81,9 @@ class TicTacToe(Game):
             if winner is player
             else Game.Result.LOST
         )
+
+    def deepcopy(self) -> Game:
+        new_game = TicTacToe()
+        new_game.state = deepcopy(self.state)
+        new_game._playing_player_index = self._playing_player_index
+        return new_game

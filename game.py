@@ -30,3 +30,6 @@ class Game:
 
     def get_result_for(self, player) -> Game.Result:
         raise NotImplementedError
+
+    def deepcopy(self) -> Game:
+        raise NotImplementedError
