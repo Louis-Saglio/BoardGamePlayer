@@ -27,7 +27,8 @@ def build_game_tree_for(game: Game, player, precedent_node: ActionNode = None):
         copied_game = game.deepcopy()
         copied_game.play(action)
         node = ActionNode(game.playing_player, action, copied_game.get_result_for(player), precedent_node)
-        build_game_tree_for(copied_game, player, node)
+        if node.outcome == Game.Result.NOT_ENDED:
+            build_game_tree_for(copied_game, player, node)
     return precedent_node
 
 
@@ -41,6 +42,8 @@ def play(game: Game):
         node: ActionNode = choice(node.children)
         game.play(node.action)
         print(game)
+        print(node.outcome)
+        print(game.get_result_for(1))
         print("-" * 30)
 
 
