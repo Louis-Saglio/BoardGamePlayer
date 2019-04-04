@@ -10,24 +10,20 @@ class Game:
         WON = "won"
         LOST = "lost"
 
-    playing_player_index = 0
-
     @property
     def players(self):
         raise NotImplementedError
 
-    def _rotate_players(self):
-        if self.playing_player_index == len(self.players) - 1:
-            self.playing_player_index = 0
-        else:
-            self.playing_player_index += 1
+    @property
+    def playing_player(self):
+        return self.players[self.playing_player_index]
 
-    def process_action(self, action):
+    @property
+    def playing_player_index(self):
         raise NotImplementedError
 
     def play(self, action):
-        self.process_action(action)
-        self._rotate_players()
+        raise NotImplementedError
 
     def get_possible_actions(self) -> FrozenSet[Tuple[Any, Any]]:
         raise NotImplementedError

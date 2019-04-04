@@ -17,16 +17,25 @@ class TicTacToe(Game):
         self.state = []
         for x in range(3):
             self.state.append([self.symbols[None] for _ in range(3)])
+        self._playing_player_index = 0
 
     def __str__(self):
         return "\n".join([" ".join(line) for line in self.state])
 
     @property
+    def playing_player_index(self):
+        return self._playing_player_index
+
+    @property
     def players(self):
         return self._players
 
-    def process_action(self, action: Tuple[int, int]):
-        self.state[action[0]][action[1]] = self.symbols[self.playing_player_index]
+    def play(self, action: Tuple[int, int]):
+        self.state[action[0]][action[1]] = self.symbols[self.playing_player]
+        if self._playing_player_index == len(self.players) - 1:
+            self._playing_player_index = 0
+        else:
+            self._playing_player_index += 1
 
     def get_possible_actions(self) -> FrozenSet[Tuple[Any, Any]]:
         actions = set()
@@ -35,7 +44,7 @@ class TicTacToe(Game):
                 cell = self.state[x][y]
                 if cell != self.symbols[None]:
                     continue
-                actions.add((self.players[self.playing_player_index], (x, y)))
+                actions.add((self.playing_player, (x, y)))
         return frozenset(actions)
 
     def get_result_for(self, player) -> Game.Result:
