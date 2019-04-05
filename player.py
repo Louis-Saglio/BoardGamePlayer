@@ -18,6 +18,16 @@ class ActionNode:
         if self.father is not None:
             self.father.children.append(self)
 
+    @property
+    def is_solvable(self):
+        return all(child.outcome != Game.Result.NOT_ENDED for child in self.children)
+
+    def get_first_final_child(self) -> ActionNode:
+        node = self
+        while node.children:
+            node = node.children[0]
+        return node
+
 
 def build_game_tree_for(game: Game, player, precedent_node: ActionNode = None):
     assert player in game.players
@@ -32,18 +42,62 @@ def build_game_tree_for(game: Game, player, precedent_node: ActionNode = None):
     return precedent_node
 
 
-def play(game: Game):
+def analyse_node_for(node: ActionNode, player):
+    if node.outcome == Game.Result.NOT_ENDED:
+        leads_to_draw = True
+        for child in node.children:
+            if leads_to_draw and child.outcome != Game.Result.DRAW:
+                leads_to_draw = False
+            if child.player == player and child.outcome == Game.Result.WON:
+                node.outcome = Game.Result.WON
+                break
+            elif child.player != player and child.outcome == Game.Result.LOST:
+                node.outcome = Game.Result.LOST
+                break
+        if leads_to_draw:
+            node.outcome = Game.Result.DRAW
+        if node.outcome != Game.Result.NOT_ENDED:
+            for child in node.children[:]:
+                if child.outcome == node.outcome:
+                    # print("kill")
+                    node.children.remove(child)
+                    del child
+
+
+def analyse_tree_for(node: ActionNode, player):
+    if node.outcome != Game.Result.NOT_ENDED:
+        # print(1)
+        pass
+    elif node.is_solvable:
+        # print(2)
+        analyse_node_for(node, player)
+        assert node.outcome != Game.Result.NOT_ENDED
+        # print(node.outcome)
+    else:
+        # print(3)
+        for child in node.children:
+            analyse_tree_for(child, player)
+
+
+def get_game_tree(game) -> ActionNode:
     try:
         node = utils.pickle_load_tictactoe_tree()
     except Exception as e:
         print(e)
-        node = build_game_tree_for(game, 0)
+        node = build_game_tree_for(game, game.players[0])
+    return node
+
+
+def play(game: Game):
+    node = get_game_tree(game)
+    analyse_tree_for(node, game.players[0])
     while node.children:
         node: ActionNode = choice(node.children)
         game.play(node.action)
         print(game)
-        print(node.outcome)
-        print(game.get_result_for(1))
+        print("result ", node.outcome)
+        # analyse_node_for(node, game.players[0])
+        # print("predict", node.outcome)
         print("-" * 30)
 
 
