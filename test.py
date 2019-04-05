@@ -82,10 +82,10 @@ def test_result_5():
     game.play((0, 1))
 
     result = game.get_result_for(0)
-    assert result == TicTacToe.Result.LOST, result
+    assert result == TicTacToe.Result.NOT_ENDED, result
 
     result = game.get_result_for(1)
-    assert result == TicTacToe.Result.WON, result
+    assert result == TicTacToe.Result.NOT_ENDED, result
 
 
 def test_result_6():
