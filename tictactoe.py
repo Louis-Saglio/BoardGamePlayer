@@ -48,7 +48,7 @@ class TicTacToe(Game):
         return frozenset(actions)
 
     def get_result_for(self, player) -> Game.Result:
-        winner, is_draw, potential_winner = None, True, None
+        is_draw = True
         for line in (
             ((0, 0), (0, 1), (0, 2)),
             ((1, 0), (1, 1), (1, 2)),
@@ -59,28 +59,18 @@ class TicTacToe(Game):
             ((0, 0), (1, 1), (2, 2)),
             ((0, 2), (1, 1), (2, 0)),
         ):
-            winning_line = True
-            for x, y in line:
+            old_value = self.state[line[0][0]][line[0][1]]
+            if is_draw and old_value == self.symbols[None]:
+                is_draw = False
+            for x, y in line[1:]:
                 if is_draw and self.state[x][y] == self.symbols[None]:
                     is_draw = False
-                actual_player = reverse_dict_get(self.symbols, self.state[x][y])
-                if potential_winner is None:
-                    potential_winner = actual_player
-                elif actual_player != potential_winner:
-                    winning_line = False
-            if winning_line:
-                winner = potential_winner
-                is_draw = False
-                break
-        return (
-            Game.Result.DRAW
-            if is_draw
-            else Game.Result.NOT_ENDED
-            if winner is None
-            else Game.Result.WON
-            if winner is player
-            else Game.Result.LOST
-        )
+                if self.state[x][y] != old_value:
+                    break
+            else:
+                if old_value != self.symbols[None]:
+                    return Game.Result.WON if reverse_dict_get(self.symbols, old_value) == player else Game.Result.LOST
+        return Game.Result.DRAW if is_draw else Game.Result.NOT_ENDED
 
     def deepcopy(self) -> Game:
         new_game = TicTacToe()
