@@ -116,6 +116,20 @@ def test_result_7():
     assert result == TicTacToe.Result.NOT_ENDED, result
 
 
+def test_result_8():
+    game = TicTacToe()
+    game.play((0, 0))
+    game.play((2, 2))
+    game.play((2, 0))
+    game.play((1, 1))
+
+    result = game.get_result_for(0)
+    assert result == TicTacToe.Result.NOT_ENDED, result
+
+    result = game.get_result_for(1)
+    assert result == TicTacToe.Result.NOT_ENDED, result
+
+
 def test_possible_actions_0():
     game = TicTacToe()
     game.play((0, 0))

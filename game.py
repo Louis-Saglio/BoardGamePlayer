@@ -11,7 +11,7 @@ class Game:
         LOST = "lost"
 
     @property
-    def players(self):
+    def players(self) -> Tuple:
         raise NotImplementedError
 
     @property
