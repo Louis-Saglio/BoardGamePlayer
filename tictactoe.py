@@ -1,6 +1,7 @@
 from copy import deepcopy
-from typing import Tuple, FrozenSet, Any
+from typing import Tuple, FrozenSet, Any, Set
 
+from decision_tree import GameInterface, Player
 from game import Game
 
 
@@ -10,7 +11,23 @@ def reverse_dict_get(dico, value):
             return key
 
 
-class TicTacToe(Game):
+class TicTacToe(GameInterface, Game):
+    def play_action(self, action):
+        return self.play(action)
+
+    def revert_action(self, action):
+        self.state[action[0]][action[1]] = self.symbols[None]
+        if self._playing_player_index == len(self.players) - 1:
+            self._playing_player_index = 0
+        else:
+            self._playing_player_index += 1
+
+    def get_current_winners(self) -> Set[Player]:
+        return {player for player in self.players if self.get_result_for(player) == Game.Result.WON}
+
+    def get_current_player(self) -> Player:
+        return self.playing_player
+
     def __init__(self):
         self._players = (0, 1)
         self.symbols = {0: "x", 1: "o", None: "."}
