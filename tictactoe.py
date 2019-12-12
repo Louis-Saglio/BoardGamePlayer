@@ -1,8 +1,10 @@
 from copy import deepcopy
+from string import digits, ascii_letters
 from typing import Tuple, FrozenSet, Any, Set
 
 from decision_tree import GameInterface, Player
 from game import Game
+from utils import convert
 
 
 def reverse_dict_get(dico, value):
@@ -11,23 +13,7 @@ def reverse_dict_get(dico, value):
             return key
 
 
-class TicTacToe(GameInterface, Game):
-    def play_action(self, action):
-        return self.play(action)
-
-    def revert_action(self, action):
-        self.state[action[0]][action[1]] = self.symbols[None]
-        if self._playing_player_index == len(self.players) - 1:
-            self._playing_player_index = 0
-        else:
-            self._playing_player_index += 1
-
-    def get_current_winners(self) -> Set[Player]:
-        return {player for player in self.players if self.get_result_for(player) == Game.Result.WON}
-
-    def get_current_player(self) -> Player:
-        return self.playing_player
-
+class TicTacToe(Game, GameInterface):
     def __init__(self):
         self._players = (0, 1)
         self.symbols = {0: "x", 1: "o", None: "."}
@@ -38,6 +24,16 @@ class TicTacToe(GameInterface, Game):
 
     def __str__(self):
         return "\n".join([" ".join(line) for line in self.state])
+
+    def revert(self, action):
+        self.state[action[0]][action[1]] = self.symbols[None]
+        if self._playing_player_index == len(self.players) - 1:
+            self._playing_player_index = 0
+        else:
+            self._playing_player_index += 1
+
+    def get_current_winners(self) -> Set[Player]:
+        return {player for player in self.players if self.get_result_for(player) == Game.Result.WON}
 
     @property
     def playing_player_index(self):
@@ -94,3 +90,15 @@ class TicTacToe(GameInterface, Game):
         new_game.state = deepcopy(self.state)
         new_game._playing_player_index = self._playing_player_index
         return new_game
+
+    def get_state_id_old(self):
+        value_by_cell_state = {".": "0", "x": "1", "o": "2"}
+        state_id = ""
+        for row in self.state:
+            for cell in row:
+                state_id += value_by_cell_state[cell]
+        chars = digits + ascii_letters
+        return convert(state_id, len(value_by_cell_state), len(chars), chars)
+
+    def get_state_id(self):
+        return str(self).replace("\n", "\\n")

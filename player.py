@@ -54,12 +54,12 @@ class ActionNode:
                 outcome = Game.Result.DRAW
             elif all_solved:
                 outcome = child.outcome
-        # if outcome != Game.Result.NOT_ENDED:
-        #     for child in self.children[:]:
-        #         if child.outcome == outcome:
-                    # print("kill")
-                    # self.children.remove(child)
-                    # del child
+        if outcome != Game.Result.NOT_ENDED:
+            for child in self.children[:]:
+                if child.outcome == outcome:
+                    print("kill")
+                    self.children.remove(child)
+                    del child
         self.cached_outcome = outcome
         return outcome
         # assert node.outcome != Game.Result.NOT_ENDED
@@ -127,32 +127,22 @@ def get_game_tree(game) -> ActionNode:
 
 def play(game: Game):
     node = get_game_tree(game)
+    print(node)
+    return
     print("tree loaded")
     analyse_tree_for(node, game.players[0])
     while node.children:
-        if node.player == game.players[0]:
+        while True:
+            action = tuple(map(int, input("choose position x,y").split(',')))
+            found = False
             for child in node.children:
-                if child.outcome == Game.Result.WON:
-                    node = child
+                if child.action == action:
+                    found = True
                     break
-            else:
-                for child in node.children:
-                    if node.outcome == Game.Result.DRAW:
-                        node = child
-                        break
-                else:
-                    node = node.children[0]
-        else:
-            while True:
-                action = tuple(map(int, input("choose position x,y").split(',')))
-                found = False
-                for child in node.children:
-                    if child.action == action:
-                        found = True
-                        break
-                if found:
-                    break
-            node: ActionNode = choice([child for child in node.children if child.outcome != Game.Result.NOT_ENDED])
+            if found:
+                node = child
+                break
+        node: ActionNode = choice([child for child in node.children if child.outcome != Game.Result.NOT_ENDED])
 
         game.play(node.action)
         print(game)
