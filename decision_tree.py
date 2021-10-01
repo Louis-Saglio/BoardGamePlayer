@@ -1,21 +1,24 @@
-from typing import Set
+from typing import Set, TypeVar, Generic, Tuple
+
+Action = TypeVar("Action")
+Player = TypeVar("Player")
 
 
-class Player:
-    pass
+class GameInterface(Generic[Action, Player]):
+    def play(self, action: Action) -> Tuple[Set[Player], Set[Action]]:
+        self.do_action(action)
+        return self.get_current_winners(), self.get_possible_actions()
 
-
-class GameInterface:
-    def play(self, action):
+    def do_action(self, action: Action):
         raise NotImplementedError
 
-    def revert(self, action):
+    def revert(self, action: Action):
         raise NotImplementedError
 
     def get_current_winners(self) -> Set[Player]:
         raise NotImplementedError
 
-    def get_possible_actions(self):
+    def get_possible_actions(self) -> Set[Action]:
         raise NotImplementedError
 
     @property
@@ -34,44 +37,34 @@ def compare(action_result):
     return action_result[1]
 
 
-def get_best_action(game: GameInterface, player: Player, return_action=False, file=None):
+def get_best_action(game: GameInterface, player: Player):
     score_by_action = {}
-    it_is_player_turn = game.playing_player is player
-    previous_state_id = str(game).replace("\n", "\\n")
-
-    if return_action:
-        print("digraph {", file=file)
     for action in game.get_possible_actions():
         game.play(action)
-
-        replace = str(game).replace("\n", "\\n")
-        print(f'"{previous_state_id}" -> "{replace}"', file=file)
-        if it_is_player_turn:
-            if player in game.get_current_winners():
-                if len(game.get_current_winners()) == 1:
+        winners = game.get_current_winners()
+        possible_actions = game.get_possible_actions()
+        if game.playing_player is player:
+            if player in winners:
+                if len(winners) == 1:
                     score = 3
                 else:
                     score = 2
-            elif game.get_current_winners():
+            elif winners:
                 score = 0
             else:
-                if not game.get_possible_actions():
+                if not possible_actions:
                     score = 1
                 else:
-                    score = get_best_action(game, player, file=file)
+                    score = get_best_action(game, player)
         else:
-            if game.get_current_winners() and player not in game.get_current_winners():
+            if player not in winners:
                 score = 0
             else:
-                if not game.get_possible_actions():
+                if not possible_actions:
                     score = 1
                 else:
-                    score = get_best_action(game, player, file=file)
+                    score = get_best_action(game, player)
 
         score_by_action[action] = score
         game.revert(action)
-
-    if return_action:
-        print("}", file=file)
-        return max(score_by_action, key=lambda x: score_by_action[x])
     return max(score_by_action.values())

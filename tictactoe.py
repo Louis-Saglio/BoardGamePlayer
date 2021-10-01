@@ -13,7 +13,7 @@ def reverse_dict_get(dico, value):
             return key
 
 
-class TicTacToe(Game, GameInterface):
+class TicTacToe(Game[Tuple[int, int], int]):
     def __init__(self):
         self._players = (0, 1)
         self.symbols = {0: "x", 1: "o", None: "."}
